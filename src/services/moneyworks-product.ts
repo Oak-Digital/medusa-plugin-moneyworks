@@ -4,6 +4,7 @@ import {
     Selector,
     TransactionBaseService,
 } from "@medusajs/medusa";
+import { MedusaError } from "@medusajs/utils";
 import { Repository } from "typeorm";
 import { MoneyworksProduct } from "../models/moneyworks-product";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
@@ -57,8 +58,24 @@ class MoneyworksProductService extends TransactionBaseService {
     }
 
     async syncAllFromMoneyworks() {
-        const products = await this.client.getProducts();
-        const parsedProducts = z.array(moneyworksProductSchema).parse(products);
+        let products: Awaited<ReturnType<MoneyWorksClient["getProducts"]>>;
+        try {
+            products = await this.client.getProducts();
+        } catch (e) {
+            throw new MedusaError(
+                MedusaError.Types.DB_ERROR,
+                "Could not fetch products from Moneyworks",
+            );
+        }
+        let parsedProducts: z.infer<typeof moneyworksProductSchema>[];
+        try {
+            parsedProducts = z.array(moneyworksProductSchema).parse(products);
+        } catch (e) {
+            throw new MedusaError(
+                MedusaError.Types.DB_ERROR,
+                "Could not parse products from Moneyworks",
+            );
+        }
         const filteredProducts = parsedProducts.filter((product) => product.code);
         return this.repository.upsert(
             filteredProducts.map((product) => ({
@@ -86,8 +103,8 @@ class MoneyworksProductService extends TransactionBaseService {
     }
 
     /**
-    * Finds all moneyworks products without variants
-    */
+     * Finds all moneyworks products without variants
+     */
     async listWithoutVariant(
         selector: Selector<MoneyworksProduct> = {},
         config: FindConfig<MoneyworksProduct> = {
