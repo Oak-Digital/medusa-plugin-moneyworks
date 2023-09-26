@@ -1,4 +1,9 @@
-import { TransactionBaseService } from "@medusajs/medusa";
+import {
+    buildQuery,
+    FindConfig,
+    Selector,
+    TransactionBaseService,
+} from "@medusajs/medusa";
 import { Repository } from "typeorm";
 import { MoneyworksProduct } from "../models/moneyworks-product";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
@@ -13,7 +18,7 @@ const optionsSchema = z.object({
     port: z.number().optional(),
     username: z.string().optional(),
     password: z.string().optional(),
-    dataFile: z.string().optional(),
+    dataFile: z.string(),
     dataFileUsername: z.string().optional(),
     dataFilePassword: z.string().optional(),
 });
@@ -27,7 +32,7 @@ class MoneyworksProductService extends TransactionBaseService {
     protected repository: Repository<MoneyworksProduct>;
     protected client: MoneyWorksClient;
 
-    constructor(container, options) {
+    constructor(container: any, options: Record<string, unknown>) {
         super(container);
         this.repository = this.activeManager_.getRepository(MoneyworksProduct);
         const parsedOptions = optionsSchema.parse(options);
@@ -55,12 +60,48 @@ class MoneyworksProductService extends TransactionBaseService {
         const products = await this.client.getProducts();
         const parsedProducts = z.array(moneyworksProductSchema).parse(products);
         const filteredProducts = parsedProducts.filter((product) => product.code);
-        this.repository.upsert(filteredProducts.map((product) => ({
-            product_code: product.code,
-            stock: product.stockonhand,
-        })), {
-            conflictPaths: {
-                product_code: true,
+        return this.repository.upsert(
+            filteredProducts.map((product) => ({
+                product_code: product.code,
+                stock: product.stockonhand,
+            })),
+            {
+                conflictPaths: {
+                    product_code: true,
+                },
+            },
+        );
+    }
+
+    async list(
+        selector: Selector<MoneyworksProduct> = {},
+        config: FindConfig<MoneyworksProduct> = {
+            skip: 0,
+            take: 20,
+            relations: [],
+        },
+    ) {
+        const query = buildQuery(selector, config);
+        return this.repository.find(query);
+    }
+
+    /**
+    * Finds all moneyworks products without variants
+    */
+    async listWithoutVariant(
+        selector: Selector<MoneyworksProduct> = {},
+        config: FindConfig<MoneyworksProduct> = {
+            skip: 0,
+            take: 20,
+            relations: [],
+        },
+    ) {
+        const query = buildQuery(selector, config);
+        return this.repository.find({
+            ...query,
+            where: {
+                ...query.where,
+                variants: [],
             },
         });
     }
