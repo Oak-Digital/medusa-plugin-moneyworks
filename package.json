@@ -25,7 +25,6 @@
     "dev": "cross-env pnpm run build:server && medusa develop"
   },
   "_olddeps": {
-    "@medusajs/admin": "^7.1.1",
     "@medusajs/cache-redis": "^1.8.8",
     "@medusajs/event-bus-local": "^1.9.6",
     "@medusajs/event-bus-redis": "^1.8.9",
@@ -39,8 +38,7 @@
     "dotenv": "16.0.3",
     "express": "^4.17.2",
     "medusa-interfaces": "^1.3.7",
-    "prism-react-renderer": "^2.0.4",
-    "typeorm": "^0.3.16"
+    "prism-react-renderer": "^2.0.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
@@ -61,7 +59,9 @@
     "typescript": "^4.5.2"
   },
   "peerDependencies": {
-    "@medusajs/medusa": "^1.16.0"
+    "@medusajs/admin": "^7.1.1",
+    "@medusajs/medusa": "^1.16.0",
+    "typeorm": "^0.3.16"
   },
   "jest": {
     "globals": {
@@ -91,6 +91,6 @@
   },
   "dependencies": {
     "@oak-digital/moneyworks": "^0.1.0",
-    "zod": "~3.21.4"
+    "zod": "~3.22.2"
   }
 }
