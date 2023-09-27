@@ -1,16 +1,13 @@
 {
   "name": "@oak-digital/medusa-plugin-moneyworks",
-  "version": "0.0.0",
+  "version": "0.0.0-local.1",
   "description": "",
   "author": "",
   "license": "MIT",
   "keywords": [
-    "sqlite",
-    "postgres",
-    "typescript",
-    "ecommerce",
-    "headless",
-    "medusa"
+    "medusa-plugin",
+    "medusa-plugin-other",
+    "moneyworks"
   ],
   "scripts": {
     "clean": "cross-env ./node_modules/.bin/rimraf dist",

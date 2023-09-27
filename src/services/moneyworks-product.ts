@@ -16,7 +16,7 @@ export type MoneyworksProductData = {
 
 const optionsSchema = z.object({
     host: z.string(),
-    port: z.number().optional(),
+    port: z.coerce.number().optional(),
     username: z.string().optional(),
     password: z.string().optional(),
     dataFile: z.string(),
