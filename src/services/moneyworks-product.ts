@@ -1,12 +1,12 @@
 import {
     buildQuery,
     FindConfig,
+    ProductVariant,
     Selector,
     TransactionBaseService,
 } from "@medusajs/medusa";
 import { MedusaError } from "@medusajs/utils";
 import { Repository } from "typeorm";
-import { MoneyworksProduct } from "../models/moneyworks-product";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { z } from "zod";
 
@@ -27,37 +27,20 @@ const optionsSchema = z.object({
 const moneyworksProductSchema = z.object({
     code: z.string().optional(),
     stockonhand: z.coerce.number().optional(),
+    bardcode: z.string().optional(),
 });
 
 class MoneyworksProductService extends TransactionBaseService {
-    protected repository: Repository<MoneyworksProduct>;
     protected client: MoneyWorksClient;
+    protected variantRepository: Repository<ProductVariant>;
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
-        this.repository = this.activeManager_.getRepository(MoneyworksProduct);
         const parsedOptions = optionsSchema.parse(options);
         this.client = new MoneyWorksClient(parsedOptions);
     }
 
-    // async findOne(id) {
-    //     return this.activeManager_.findOne(MoneyworksProduct, id)
-    // }
-
-    async upsert(data: MoneyworksProductData) {
-        return this.repository.upsert(
-            {
-                ...data,
-            },
-            {
-                conflictPaths: {
-                    product_code: true,
-                },
-            },
-        );
-    }
-
-    async syncAllFromMoneyworks() {
+    async syncAllInventoryFromMoneyworks() {
         let products: Awaited<ReturnType<MoneyWorksClient["getProducts"]>>;
         try {
             products = await this.client.getProducts();
@@ -67,65 +50,36 @@ class MoneyworksProductService extends TransactionBaseService {
                 "Could not fetch products from Moneyworks",
             );
         }
-        let parsedProducts: z.infer<typeof moneyworksProductSchema>[];
+        const productsArraySchema = z.array(moneyworksProductSchema);
+        let parsedProducts: z.infer<typeof productsArraySchema>;
         try {
-            parsedProducts = z.array(moneyworksProductSchema).parse(products);
+            parsedProducts = productsArraySchema.parse(products);
         } catch (e) {
             throw new MedusaError(
                 MedusaError.Types.DB_ERROR,
                 "Could not parse products from Moneyworks",
             );
         }
-        const filteredProducts = parsedProducts.filter((product) => product.code);
-        return this.repository.upsert(
-            filteredProducts.map((product) => ({
-                product_code: product.code,
-                stock: product.stockonhand,
-            })),
-            {
-                conflictPaths: {
-                    product_code: true,
-                },
-            },
+        const filteredProducts = parsedProducts.filter(
+            (product) => product.bardcode && product.stockonhand !== undefined,
+        );
+
+        // Update the variants by selecting them with barcode and updating the stock
+        await Promise.all(
+            filteredProducts.map(async (product) => {
+                const variant = await this.variantRepository.findOne({
+                    where: {
+                        barcode: product.bardcode,
+                    },
+                });
+                if (!variant || product.stockonhand === undefined) {
+                    return;
+                }
+                variant.inventory_quantity = product.stockonhand;
+                await this.variantRepository.save(variant);
+            }),
         );
     }
-
-    async list(
-        selector: Selector<MoneyworksProduct> = {},
-        config: FindConfig<MoneyworksProduct> = {
-            skip: 0,
-            take: 20,
-            relations: [],
-        },
-    ) {
-        const query = buildQuery(selector, config);
-        return this.repository.find(query);
-    }
-
-    /**
-     * Finds all moneyworks products without variants
-     */
-    async listWithoutVariant(
-        selector: Selector<MoneyworksProduct> = {},
-        config: FindConfig<MoneyworksProduct> = {
-            skip: 0,
-            take: 20,
-            relations: [],
-        },
-    ) {
-        const query = buildQuery(selector, config);
-        return this.repository.find({
-            ...query,
-            where: {
-                ...query.where,
-                variants: [],
-            },
-        });
-    }
-
-    // getMessage() {
-    //     return `Welcome to My Store!`;
-    // }
 }
 
 export default MoneyworksProductService;
