@@ -1,19 +1,24 @@
 {
   "name": "@oak-digital/medusa-plugin-moneyworks",
-  "version": "0.0.0-local.1",
+  "version": "0.0.0",
   "description": "",
-  "author": "",
+  "author": "Oak Digital",
   "license": "MIT",
   "keywords": [
     "medusa-plugin",
     "medusa-plugin-other",
     "moneyworks"
   ],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "cross-env ./node_modules/.bin/rimraf dist",
-    "build": "cross-env pnpm run clean && pnpm run build:server && pnpm run build:admin",
+    "build": "cross-env pnpm run build:server",
+    "_build": "cross-env pnpm run clean && pnpm run build:server && pnpm run build:admin",
     "build:server": "cross-env pnpm run clean && tsc -p tsconfig.json",
-    "build:admin": "cross-env medusa-admin build",
+    "_build:admin": "cross-env medusa-admin build",
+    "release": "bumpp",
     "watch": "cross-env tsc --watch",
     "test": "cross-env jest",
     "seed": "cross-env medusa seed -f ./data/seed.json",
@@ -46,6 +51,7 @@
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
     "babel-preset-medusa-package": "^1.1.13",
+    "bumpp": "^9.2.0",
     "cross-env": "^7.0.3",
     "eslint": "^6.8.0",
     "jest": "^27.3.1",
