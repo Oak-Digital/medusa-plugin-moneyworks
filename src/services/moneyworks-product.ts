@@ -37,6 +37,7 @@ class MoneyworksProductService extends TransactionBaseService {
         try {
             products = await this.client.getProducts();
         } catch (e) {
+            console.error('Could not fetch products from Moneyworks', e)
             throw new MedusaError(
                 MedusaError.Types.DB_ERROR,
                 "Could not fetch products from Moneyworks",
