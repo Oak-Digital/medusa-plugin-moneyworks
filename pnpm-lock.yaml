@@ -5,8 +5,8 @@ dependencies:
     specifier: ^7.1.1
     version: 7.1.1(@medusajs/medusa@1.16.0)(@types/node@17.0.8)(@types/react@18.2.23)(csstype@3.1.2)(eslint@6.8.0)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)(typescript@4.5.2)
   '@oak-digital/moneyworks':
-    specifier: ^0.1.0
-    version: 0.1.0
+    specifier: ^0.1.1
+    version: 0.1.1
   typeorm:
     specifier: ^0.3.16
     version: 0.3.17(ioredis@5.3.2)(pg@8.11.3)
@@ -4223,13 +4223,13 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@oak-digital/moneyworks@0.1.0:
-    resolution: {integrity: sha512-R4WfjmlC7x3YxYHW/CMGt/A8fthGmXB7f6ditmjoc+Ix74oTbFa4FoQ5vcQLSFicdFo/ZR2cwD6Ey1P+f+maLQ==}
+  /@oak-digital/moneyworks@0.1.1:
+    resolution: {integrity: sha512-Whz3zv7pWsAt2aGUrpytn7z1O//ByDiuzd3TBP0BGtAljuKg/EEJrpsuCM/G4fo0Zb1CMSW57RRd0B84OYtEoA==}
     hasBin: true
     dependencies:
       '@commander-js/extra-typings': 11.0.0(commander@11.0.0)
       '@types/crypto-js': 4.1.2
-      axios: 1.5.0
+      axios: 1.5.1
       commander: 11.0.0
       crypto-js: 4.1.1
       fast-xml-parser: 4.3.1
@@ -7923,8 +7923,8 @@ packages:
       - debug
     dev: false
 
-  /axios@1.5.0:
-    resolution: {integrity: sha512-D4DdjDo5CY50Qms0qGQTTw6Q44jl7zRwY7bthds06pUGfChBCTcQs+N743eFWGEd6pRTMd6A+I87aWyFV5wiZQ==}
+  /axios@1.5.1:
+    resolution: {integrity: sha512-Q28iYCWzNHjAm+yEAot5QaAMxhMghWLFVf7rRdwhUI+c2jix2DUXjAHXVi+s1ibs3mjPO/cCgbA++3BjD0vP/A==}
     dependencies:
       follow-redirects: 1.15.3
       form-data: 4.0.0

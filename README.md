@@ -43,3 +43,8 @@ const plugins = [
 
 To make synchronization work, the barcode or SKU should be set on a variant.
 The synchronization will sync inventory quantity, SKU and barcode.
+
+## Orders
+
+Whenever an order is created in medusa it will be sent to MoneyWorks as a transaction.
+Currently it is required to have a name in the names table of MoneyWorks with the namecode `WEB_ORDER`, which all transactions will be created to.

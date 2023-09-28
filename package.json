@@ -94,7 +94,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@oak-digital/moneyworks": "^0.1.0",
+    "@oak-digital/moneyworks": "^0.1.1",
     "zod": "~3.22.2"
   }
 }
