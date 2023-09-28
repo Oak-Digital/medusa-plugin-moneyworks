@@ -9,20 +9,11 @@ import { MedusaError } from "@medusajs/utils";
 import { Repository } from "typeorm";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { z } from "zod";
+import { optionsSchema } from '../lib/options'
 
 export type MoneyworksProductData = {
     product_code: string;
 };
-
-const optionsSchema = z.object({
-    host: z.string(),
-    port: z.coerce.number().optional(),
-    username: z.string().optional(),
-    password: z.string().optional(),
-    dataFile: z.string(),
-    dataFileUsername: z.string().optional(),
-    dataFilePassword: z.string().optional(),
-});
 
 const moneyworksProductSchema = z.object({
     code: z.coerce.string().optional(),

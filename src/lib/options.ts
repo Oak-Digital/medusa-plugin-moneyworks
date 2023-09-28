@@ -1,0 +1,12 @@
+import { z } from "zod";
+
+export const optionsSchema = z.object({
+    host: z.string(),
+    port: z.coerce.number().optional(),
+    username: z.string().optional(),
+    password: z.string().optional(),
+    dataFile: z.string(),
+    dataFileUsername: z.string().optional(),
+    dataFilePassword: z.string().optional(),
+    scheduledSyncString: z.string().default("0 0 2 ? * * *").or(z.null()),
+});
