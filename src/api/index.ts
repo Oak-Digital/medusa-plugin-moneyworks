@@ -10,8 +10,7 @@ export default (rootDirectory, options) => {
     router.use(express.urlencoded({ extended: true }))
 
     const adminRouterInstance = adminRouter(rootDirectory, options);
-    // TODO: fix route
-    router.use("/admin/x", adminRouterInstance);
+    router.use("/admin/moneyworks", adminRouterInstance);
     // router.use("/store", storeRouter(rootDirectory, options));
 
     router.use(errorHandler());
