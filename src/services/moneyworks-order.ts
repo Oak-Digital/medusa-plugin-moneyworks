@@ -1,4 +1,4 @@
-import { Address, Order, TransactionBaseService } from "@medusajs/medusa";
+import { Address, Order, TotalsService, TransactionBaseService } from "@medusajs/medusa";
 import { MedusaError } from "@medusajs/utils";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { encode } from "html-entities";
@@ -8,12 +8,14 @@ import { optionsSchema } from "../lib/options";
 class MoneyworksOrderService extends TransactionBaseService {
     protected client: MoneyWorksClient;
     protected orderRepository_: Repository<Order>;
+    private totalsService_: TotalsService;
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
         const parsedOptions = optionsSchema.parse(options);
         this.orderRepository_ = this.activeManager_.getRepository(Order);
         this.client = new MoneyWorksClient(parsedOptions);
+        this.totalsService_ = container.totalsService;
     }
 
     private getFullNameFromAddress(address: Address) {
@@ -46,6 +48,7 @@ class MoneyworksOrderService extends TransactionBaseService {
                 "shipping_address",
                 "items",
                 "items.variant",
+                "items.tax_lines",
             ],
         });
 
@@ -70,15 +73,18 @@ class MoneyworksOrderService extends TransactionBaseService {
             prodpricecode: "A",
             mailingaddress: this.formatAddress(order.billing_address),
             deliveryaddress: this.formatAddress(order.shipping_address),
-            detail: order.items.map((item) => {
-                const net =
-                    (item.total ?? item.unit_price * item.quantity) -
-                    (item.includes_tax ? item.tax_total ?? 0 : 0);
-                const tax = item.tax_total ?? 0;
+            detail: await Promise.all(order.items.map(async (item) => {
+                const gross = await this.totalsService_.getLineItemTotal(item, order, {
+                    include_tax: true,
+                })
+                const net = await this.totalsService_.getLineItemTotal(item, order, {
+                    include_tax: false,
+                })
+                const tax = gross - net;
                 return {
                     net,
                     tax,
-                    gross: net + tax,
+                    gross,
                     // TODO: Make this configurable
                     account: "1000-",
                     orderqty: item.quantity,
@@ -91,7 +97,7 @@ class MoneyworksOrderService extends TransactionBaseService {
                     unitprice: net / item.quantity,
                     description: item.title,
                 };
-            }),
+            })),
         });
     }
 }
