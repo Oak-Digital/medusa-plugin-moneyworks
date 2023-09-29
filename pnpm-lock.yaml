@@ -7,6 +7,9 @@ dependencies:
   '@oak-digital/moneyworks':
     specifier: ^0.1.2
     version: 0.1.2
+  html-entities:
+    specifier: ^2.4.0
+    version: 2.4.0
   typeorm:
     specifier: ^0.3.16
     version: 0.3.17(ioredis@5.3.2)(pg@8.11.3)

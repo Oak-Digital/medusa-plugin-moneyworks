@@ -95,6 +95,7 @@
   },
   "dependencies": {
     "@oak-digital/moneyworks": "^0.1.2",
+    "html-entities": "^2.4.0",
     "zod": "~3.22.2"
   }
 }

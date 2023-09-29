@@ -1,6 +1,7 @@
 import { Address, Order, TransactionBaseService } from "@medusajs/medusa";
 import { MedusaError } from "@medusajs/utils";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
+import { encode } from "html-entities";
 import { Repository } from "typeorm";
 import { optionsSchema } from "../lib/options";
 
@@ -29,7 +30,10 @@ class MoneyworksOrderService extends TransactionBaseService {
             address.country?.display_name,
         ];
 
-        const addressString = lines.filter((l) => l).join("&#13;");
+        const addressString = lines
+            .filter((l) => l)
+            .map((l) => encode(l, { level: "xml", mode: "nonAsciiPrintable" }))
+            .join("&#13;");
 
         return addressString;
     }
@@ -37,7 +41,12 @@ class MoneyworksOrderService extends TransactionBaseService {
     async createOrderById(orderId: string) {
         const order = await this.orderRepository_.findOne({
             where: { id: orderId },
-            relations: ["billing_address", "shipping_address", "items", "items.variant"],
+            relations: [
+                "billing_address",
+                "shipping_address",
+                "items",
+                "items.variant",
+            ],
         });
 
         if (!order) {
@@ -48,12 +57,14 @@ class MoneyworksOrderService extends TransactionBaseService {
     }
 
     async createOrder(order: Order) {
-        const { first_name, last_name } = order.billing_address;
         await this.client.createTransaction({
             type: "SOI",
             flag: "EDI",
             namecode: "WEB_ORDER",
-            tofrom: `${first_name} ${last_name}`,
+            tofrom: encode(this.getFullNameFromAddress(order.billing_address), {
+                level: "xml",
+                mode: "nonAsciiPrintable",
+            }),
             duedate: order.created_at,
             transdate: order.created_at,
             prodpricecode: "A",
