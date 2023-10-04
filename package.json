@@ -49,6 +49,7 @@
     "@babel/preset-typescript": "^7.21.4",
     "@medusajs/medusa": "^1.16.0",
     "@types/express": "^4.17.13",
+    "@types/http-status-codes": "^1.2.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
     "babel-preset-medusa-package": "^1.1.13",
@@ -94,8 +95,10 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@oak-digital/moneyworks": "^0.1.2",
+    "@oak-digital/moneyworks": "^0.2.0",
     "html-entities": "^2.4.0",
-    "zod": "~3.22.2"
+    "http-status-codes": "^2.3.0",
+    "zod": "~3.22.2",
+    "zod-express-middleware": "^1.4.0"
   }
 }

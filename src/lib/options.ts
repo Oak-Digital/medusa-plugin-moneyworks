@@ -9,4 +9,7 @@ export const optionsSchema = z.object({
     dataFileUsername: z.string().optional(),
     dataFilePassword: z.string().optional(),
     scheduledSyncString: z.string().default("0 0 2 ? * * *").or(z.null()),
+    moneyworksSecret: z.string().optional(),
 });
+
+export type Options = z.infer<typeof optionsSchema>;

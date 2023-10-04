@@ -10,7 +10,6 @@ yarn-error.log
 coverage
 
 !src/**
-src/*/README.md
 
 ./tsconfig.tsbuildinfo
 package-lock.json
