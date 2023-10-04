@@ -62,7 +62,6 @@ class MoneyworksOrderService extends TransactionBaseService {
     async createOrder(order: Order) {
         await this.client.createTransaction({
             type: "SOI",
-            flag: "EDI",
             namecode: "WEB_ORDER",
             tofrom: encode(this.getFullNameFromAddress(order.billing_address), {
                 level: "xml",
