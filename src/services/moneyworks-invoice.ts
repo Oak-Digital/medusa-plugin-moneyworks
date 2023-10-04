@@ -5,12 +5,13 @@ import {
 } from "@medusajs/medusa";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { Repository } from "typeorm";
-import { optionsSchema } from "../lib/options";
+import { Options, optionsSchema } from "../lib/options";
 
 class MoneyworksInvoiceService extends TransactionBaseService {
     protected client: MoneyWorksClient;
     protected orderRepository_: Repository<Order>;
     protected eventBusService_: EventBusService;
+    protected options_: Options;
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
@@ -18,6 +19,7 @@ class MoneyworksInvoiceService extends TransactionBaseService {
         this.orderRepository_ = this.activeManager_.getRepository(Order);
         this.client = new MoneyWorksClient(parsedOptions);
         this.eventBusService_ = container.eventBusService;
+        this.options_ = parsedOptions;
     }
 
     public async invoiceReady(
@@ -29,7 +31,7 @@ class MoneyworksInvoiceService extends TransactionBaseService {
             select: ["id"],
         });
         const orderId = order?.id;
-        const invoiceResponse = await this.client.getInvoice(invoiceId);
+        const invoiceResponse = await this.client.getInvoice(invoiceId, this.options_.invoiceForm);
         // FIXME: Do not use type casting
         const invoiceBuffer = invoiceResponse.data as any as Buffer;
         // TODO: Figure out if there is a better way to send the buffer

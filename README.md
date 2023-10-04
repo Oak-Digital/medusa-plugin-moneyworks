@@ -36,6 +36,7 @@ const plugins = [
       dataFilePassword: process.env.MW_DATA_FILE_PASSWORD,
       scheduledSyncString: "0 0 2 ? * * *", // a cron string for when the sync should run, default "0 0 2 ? * * *"
       moneyworksSecret: process.env.MW_SECRET, // A secret to use to make endpoints under /moneyworks work. Should be discussed with moneyworks.
+      invoiceForm: process.env.MW_INVOICE_FORM, // Which form to use for the generated invoice (Optional)
     }
   }
 ]
