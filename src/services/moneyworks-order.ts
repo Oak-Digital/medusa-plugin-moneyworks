@@ -61,12 +61,16 @@ class MoneyworksOrderService extends TransactionBaseService {
 
     async createOrder(order: Order) {
         await this.client.createTransaction({
+            // FIXME: toString should not be needed here
+            theirref: order.display_id.toString(),
             type: "SOI",
             namecode: "WEB_ORDER",
             tofrom: encode(this.getFullNameFromAddress(order.billing_address), {
                 level: "xml",
                 mode: "nonAsciiPrintable",
             }),
+            user2: order.customer.phone ?? order.shipping_address.phone ?? order.billing_address.phone ?? undefined,
+            user3: order.customer.email,
             duedate: order.created_at,
             transdate: order.created_at,
             prodpricecode: "A",
