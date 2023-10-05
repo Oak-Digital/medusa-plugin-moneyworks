@@ -37,6 +37,7 @@ const plugins = [
       scheduledSyncString: "0 0 2 ? * * *", // a cron string for when the sync should run, default "0 0 2 ? * * *"
       moneyworksSecret: process.env.MW_SECRET, // A secret to use to make endpoints under /moneyworks work. Should be discussed with moneyworks.
       invoiceForm: process.env.MW_INVOICE_FORM, // Which form to use for the generated invoice (Optional)
+      defaultContra: process.env.MW_CONTRA, // The contra field to use for transactions
     }
   }
 ]
@@ -54,9 +55,11 @@ Currently it is required to have a name in the names table of MoneyWorks with th
 
 ## Events
 
-### `moneyworks.invoice.ready`
+### `order.invoice.ready`
 
-This event happens when MoneyWorks sends a POST request to `/moneyworks/invoice-ready` with the following fields.
+This event happens just after `order.placed`
+
+~~This event happens when MoneyWorks sends a POST request to `/moneyworks/invoice-ready` with the following fields.~~ 
 
 ```ts
 {
@@ -70,7 +73,7 @@ Event data:
 ```ts
 {
   invoice: string, // The invoice pdf as a base64 encoded string
-  orderId: string, // The actual medusa order id (e.g. "order_...")
+  id: string, // The actual medusa order id (e.g. "order_...")
 }
 ```
 

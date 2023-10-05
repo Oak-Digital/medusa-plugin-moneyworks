@@ -3,16 +3,18 @@ import { MedusaError } from "@medusajs/utils";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { encode } from "html-entities";
 import { Repository } from "typeorm";
-import { optionsSchema } from "../lib/options";
+import { Options, optionsSchema } from "../lib/options";
 
 class MoneyworksOrderService extends TransactionBaseService {
     protected client: MoneyWorksClient;
     protected orderRepository_: Repository<Order>;
     private totalsService_: TotalsService;
+    private options_: Options;
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
         const parsedOptions = optionsSchema.parse(options);
+        this.options_ = parsedOptions;
         this.orderRepository_ = this.activeManager_.getRepository(Order);
         this.client = new MoneyWorksClient(parsedOptions);
         this.totalsService_ = container.totalsService;
@@ -60,17 +62,19 @@ class MoneyworksOrderService extends TransactionBaseService {
     }
 
     async createOrder(order: Order) {
-        await this.client.createTransaction({
-            // FIXME: toString should not be needed here
-            theirref: order.display_id.toString(),
-            type: "SOI",
+        const response = await this.client.createTransaction({
+            return_seq: true,
+            theirref: order.display_id,
+            type: "DII",
             namecode: "WEB_ORDER",
             tofrom: encode(this.getFullNameFromAddress(order.billing_address), {
                 level: "xml",
                 mode: "nonAsciiPrintable",
             }),
-            user2: order.customer.phone ?? order.shipping_address.phone ?? order.billing_address.phone ?? undefined,
-            user3: order.customer.email,
+            flag: "WEB",
+            contra: this.options_.defaultContra,
+            user2: order.customer?.phone ?? order.shipping_address?.phone ?? order.billing_address?.phone ?? undefined,
+            user3: order.customer?.email ?? order.email ?? undefined,
             duedate: order.created_at,
             transdate: order.created_at,
             prodpricecode: "A",
@@ -102,6 +106,8 @@ class MoneyworksOrderService extends TransactionBaseService {
                 };
             })),
         });
+
+        return response.data;
     }
 }
 

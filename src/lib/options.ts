@@ -11,6 +11,7 @@ export const optionsSchema = z.object({
     scheduledSyncString: z.string().default("0 0 2 ? * * *").or(z.null()),
     moneyworksSecret: z.string().optional(),
     invoiceForm: z.string().optional(),
+    defaultContra: z.string().or(z.number()).optional(),
 });
 
 export type Options = z.infer<typeof optionsSchema>;
