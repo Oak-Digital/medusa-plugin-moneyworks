@@ -1,6 +1,6 @@
 {
   "name": "@oak-digital/medusa-plugin-moneyworks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "packageManager": "pnpm@8.7.5",
   "author": "Oak Digital",
