@@ -1,6 +1,7 @@
 import { Address, Order, TotalsService, TransactionBaseService } from "@medusajs/medusa";
 import { MedusaError } from "@medusajs/utils";
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
+import Handlebars from "handlebars";
 import { encode } from "html-entities";
 import { Repository } from "typeorm";
 import { Options, optionsSchema } from "../lib/options";
@@ -10,6 +11,7 @@ class MoneyworksOrderService extends TransactionBaseService {
     protected orderRepository_: Repository<Order>;
     private totalsService_: TotalsService;
     private options_: Options;
+    private nameCodeTemplate_: ReturnType<typeof Handlebars.compile>;
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
@@ -18,6 +20,8 @@ class MoneyworksOrderService extends TransactionBaseService {
         this.orderRepository_ = this.activeManager_.getRepository(Order);
         this.client = new MoneyWorksClient(parsedOptions);
         this.totalsService_ = container.totalsService;
+        const handlebars: typeof Handlebars = parsedOptions.handlebars ?? Handlebars;
+        this.nameCodeTemplate_ = handlebars.compile(parsedOptions.transactionNameCodeTemplate ?? 'WEB_ORDER');
     }
 
     private getFullNameFromAddress(address: Address) {
@@ -62,11 +66,12 @@ class MoneyworksOrderService extends TransactionBaseService {
     }
 
     async createOrder(order: Order) {
+        const namecode = this.nameCodeTemplate_(order);
         const response = await this.client.createTransaction({
             return_seq: true,
             theirref: order.display_id,
             type: "DII",
-            namecode: "WEB_ORDER",
+            namecode,
             tofrom: encode(this.getFullNameFromAddress(order.billing_address), {
                 level: "xml",
                 mode: "nonAsciiPrintable",

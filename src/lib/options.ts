@@ -12,6 +12,8 @@ export const optionsSchema = z.object({
     moneyworksSecret: z.string().optional(),
     invoiceForm: z.string().optional(),
     defaultContra: z.string().or(z.number()).optional(),
+    handlebars: z.any().optional(),
+    transactionNameCodeTemplate: z.string().optional(),
 });
 
 export type Options = z.infer<typeof optionsSchema>;

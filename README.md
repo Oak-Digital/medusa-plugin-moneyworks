@@ -38,6 +38,8 @@ const plugins = [
       moneyworksSecret: process.env.MW_SECRET, // A secret to use to make endpoints under /moneyworks work. Should be discussed with moneyworks.
       invoiceForm: process.env.MW_INVOICE_FORM, // Which form to use for the generated invoice (Optional)
       defaultContra: process.env.MW_CONTRA, // The contra field to use for transactions
+      handlebars: Handlebars, // optional. If you want your own handlebars with helpers you can use this here
+      transactionNameCodeTemplate: 'WEB_{{ shipping_address.country_code }}', // optional A handlebars template for the namecode on the transaction. Defaults to "WEB_ORDER"
     }
   }
 ]
