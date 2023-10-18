@@ -35,7 +35,7 @@ class MoneyworksOrderService extends TransactionBaseService {
             address.address_2,
             address.city,
             address.postal_code,
-            address.country?.display_name,
+            address.country?.display_name ?? address.country_code,
         ];
 
         const addressString = lines
@@ -51,7 +51,9 @@ class MoneyworksOrderService extends TransactionBaseService {
             where: { id: orderId },
             relations: [
                 "billing_address",
+                "billing_address.country",
                 "shipping_address",
+                "shipping_address.country",
                 "items",
                 "items.variant",
                 "items.tax_lines",
