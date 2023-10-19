@@ -92,10 +92,10 @@ class MoneyworksOrderService extends TransactionBaseService {
             detail: await Promise.all(order.items.map(async (item) => {
                 const gross = await this.totalsService_.getLineItemTotal(item, order, {
                     include_tax: true,
-                })
+                }) / 100
                 const net = await this.totalsService_.getLineItemTotal(item, order, {
                     include_tax: false,
-                })
+                }) / 100
                 const tax = gross - net;
                 return {
                     net,
