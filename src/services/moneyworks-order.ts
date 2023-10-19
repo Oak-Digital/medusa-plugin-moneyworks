@@ -12,6 +12,7 @@ class MoneyworksOrderService extends TransactionBaseService {
     private totalsService_: TotalsService;
     private options_: Options;
     private nameCodeTemplate_: ReturnType<typeof Handlebars.compile>;
+    private stockLocationTemplate_: ReturnType<typeof Handlebars.compile> | ((...args: any[]) => undefined | string);
 
     constructor(container: any, options: Record<string, unknown>) {
         super(container);
@@ -22,6 +23,7 @@ class MoneyworksOrderService extends TransactionBaseService {
         this.totalsService_ = container.totalsService;
         const handlebars: typeof Handlebars = parsedOptions.handlebars ?? Handlebars;
         this.nameCodeTemplate_ = handlebars.compile(parsedOptions.transactionNameCodeTemplate ?? 'WEB_ORDER');
+        this.stockLocationTemplate_ = parsedOptions.transactionStockLocationTemplate ? handlebars.compile(parsedOptions.transactionStockLocationTemplate) : () => undefined;
     }
 
     private getFullNameFromAddress(address: Address) {
@@ -110,6 +112,10 @@ class MoneyworksOrderService extends TransactionBaseService {
                     stockcode: item.variant.sku,
                     unitprice: net / item.quantity,
                     description: item.title,
+                    stocklocation: this.stockLocationTemplate_({
+                        order,
+                        item,
+                    }),
                 };
             })),
         });

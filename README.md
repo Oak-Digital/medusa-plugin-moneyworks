@@ -40,6 +40,7 @@ const plugins = [
       defaultContra: process.env.MW_CONTRA, // The contra field to use for transactions
       handlebars: Handlebars, // optional. If you want your own handlebars with helpers you can use this here
       transactionNameCodeTemplate: 'WEB_{{ shipping_address.country_code }}', // optional A handlebars template for the namecode on the transaction. Defaults to "WEB_ORDER"
+      transactionStockLocationTemplate: '{{ order.shipping_address.country_code }}' // optional a handlebars template for stock location on line items with the order (key: order) and the line item (key: item) as the context
     }
   }
 ]
