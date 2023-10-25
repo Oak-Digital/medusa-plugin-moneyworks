@@ -31,10 +31,12 @@ class MoneyworksOrderService extends TransactionBaseService {
     }
 
     private formatAddress(address: Address) {
+        const address12String = [address.address_1, address.address_2].filter((l) => l).join(", ");
+        const nameCompanyString = [this.getFullNameFromAddress(address), address.company].filter((l) => l).join(", ");
+
         const lines = [
-            this.getFullNameFromAddress(address),
-            address.address_1,
-            address.address_2,
+            nameCompanyString,
+            address12String,
             address.city,
             address.postal_code,
             address.country?.display_name ?? address.country_code,
