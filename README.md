@@ -81,3 +81,18 @@ Event data:
 ```
 
 This event can be used in a notification provider to send a notification with the invoice to the customer.
+
+This can be used as a fallback to send an email to the customer, just without an invoice.
+
+### `order.invoice.failed`
+
+If the invoice could not be fetched from MoneyWorks, this event will be fired instead of `order.invoice.ready`
+
+Event data:
+
+```ts
+{
+  id: string, // The medusa order id
+  invoiceId: number, // The sequencenumber of the invoice that failed from MoneyWorks
+}
+```

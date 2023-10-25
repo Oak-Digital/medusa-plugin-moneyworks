@@ -6,7 +6,7 @@ import {
 import { MoneyWorksClient } from "@oak-digital/moneyworks";
 import { Repository } from "typeorm";
 import { Options, optionsSchema } from "../lib/options";
-import { INVOICE_READY_EVENT } from "../lib/events";
+import { INVOICE_FAILED_EVENT, INVOICE_READY_EVENT } from "../lib/events";
 
 class MoneyworksInvoiceService extends TransactionBaseService {
     protected client: MoneyWorksClient;
@@ -36,18 +36,36 @@ class MoneyworksInvoiceService extends TransactionBaseService {
             });
             orderId = order?.id;
         }
-        // const orderId = order?.id;
-        const invoiceResponse = await this.client.getInvoice(
-            invoiceId,
-            this.options_.invoiceForm,
-        );
-        // FIXME: Do not use type casting
-        const invoiceBuffer = invoiceResponse.data as any as Buffer;
-        // TODO: Figure out if there is a better way to send the buffer
-        const invoice = invoiceBuffer.toString("base64");
-        await this.eventBusService_.emit(INVOICE_READY_EVENT, {
-            invoice,
+
+        if (!orderId) {
+            throw new Error("Order not found for invoice ready event");
+        }
+
+        try {
+            const invoiceResponse = await this.client.getInvoice(
+                invoiceId,
+                this.options_.invoiceForm,
+            );
+            // FIXME: Do not use type casting
+            const invoiceBuffer = invoiceResponse.data as any as Buffer;
+            // TODO: Figure out if there is a better way to send the buffer
+            const invoice = invoiceBuffer.toString("base64");
+            await this.eventBusService_.emit(INVOICE_READY_EVENT, {
+                invoice,
+                id: orderId,
+            });
+        } catch (error) {
+            await this.invoiceFailed(orderId, invoiceId);
+        }
+    }
+
+    public async invoiceFailed(
+        orderId: string,
+        invoiceId?: string | number,
+    ) {
+        await this.eventBusService_.emit(INVOICE_FAILED_EVENT, {
             id: orderId,
+            invoiceId,
         });
     }
 }
